@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import dash
 from dash import dcc, html
@@ -7,8 +8,27 @@ import plotly.graph_objs as go
 # Initialize the Dash app
 app = dash.Dash(__name__)
 
+
+def extract_genus(description):
+    if pd.isnull(description):
+        return None
+    match = re.search(r"\((\w+)\s+\w+\)$", description)
+    if match:
+        genus = match.group(1)
+        if not any(char.isdigit() for char in genus):
+            return genus
+    return None
+
+
 # Get unique values for the dropdown options
-df = pd.read_csv("data/victor_observations.csv")
+df = pd.read_csv("data/london_observations-2022.csv")
+# Fill the 'perching_genus' column where it is empty and 'description' contains a genus
+df["field:perching on"] = df.apply(
+    lambda row: extract_genus(row["description"])
+    if pd.isnull(row["field:perching on"]) and extract_genus(row["description"])
+    else row["field:perching on"],
+    axis=1,
+)
 df_filtered = df.dropna(subset=["field:perching on"])
 df_filtered["perching_genus"] = df_filtered["field:perching on"].apply(
     lambda x: x.split()[0]
