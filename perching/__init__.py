@@ -51,8 +51,6 @@ df_grouped = (
     df.groupby(["perching_genus", "taxon_family_name"]).size().reset_index(name="count")
 )
 
-print(df_grouped.head())
-
 # Layout of the app
 app.layout = html.Div(
     [
@@ -108,7 +106,6 @@ season_family_counts = (
     .reset_index()
 )
 season_family_counts.rename(columns={"taxon_family_name": "family_count"}, inplace=True)
-print(season_family_counts)
 
 # Ensure the seasons are in the correct order
 season_order = ["Winter", "Spring", "Summer", "Autumn"]
