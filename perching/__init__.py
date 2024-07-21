@@ -103,8 +103,12 @@ filtered_df = df[df["perching_genus"].isin(valid_genus)]
 
 # Aggregate data by season and genus
 season_family_counts = (
-    filtered_df.groupby(["season", "perching_genus"]).size().reset_index(name="count")
+    filtered_df.groupby(["season", "perching_genus"])["taxon_family_name"]
+    .nunique()
+    .reset_index()
 )
+season_family_counts.rename(columns={"taxon_family_name": "family_count"}, inplace=True)
+print(season_family_counts)
 
 # Ensure the seasons are in the correct order
 season_order = ["Winter", "Spring", "Summer", "Autumn"]
@@ -121,7 +125,7 @@ for genus in valid_genus:
     line_fig.add_trace(
         go.Scatter(
             x=genus_data["season"],
-            y=genus_data["count"],
+            y=genus_data["family_count"],
             mode="lines+markers",
             name=genus,
         )
